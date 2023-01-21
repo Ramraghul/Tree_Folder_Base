@@ -1,23 +1,56 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { Treebeard } from "react-treebeard";
+import Task from './Task'
+
+const data = {
+  name: "Category 1",
+  toggled: true,
+  children: []
+};
 
 function App() {
+  const [treeData, setTreeData] = useState(data);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedNode, setSelectedNode] = useState(null);
+
+  function handleAddCategory() {
+    setModalOpen(true);
+  }
+
+  function handleAddSubcategory() {
+    setModalOpen(true);
+  }
+
+  function handleModalClose(categoryName) {
+    if (selectedNode) {
+      selectedNode.children.push({ name: categoryName });
+    } else {
+      treeData.children.push({ name: categoryName, children: [] });
+    }
+    setTreeData(treeData);
+    setModalOpen(false);
+  }
+
+  function onToggle(node, toggled) {
+    if (node.children) {
+      node.toggled = toggled;
+    }
+    setSelectedNode(node);
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <button onClick={handleAddCategory}>Add Category</button>
+      {selectedNode && (
+        <button onClick={handleAddSubcategory}>Add Subcategory</button>
+      )}
+      <Treebeard data={treeData} onToggle={onToggle} />
+      {modalOpen && (
+        <Task
+          handleClose={handleModalClose}
+          prompt="Enter category name:"
+        />
+      )}
     </div>
   );
 }
